@@ -7,11 +7,13 @@
 const app = require('../app');
 const debug = require('debug')('acor:server');
 const http = require('http');
+const dotenv = require('dotenv');
 
 /**
  * Get port from environment and store in Express.
  */
 
+dotenv.config();
 const port = normalizePort(process.env.PORT || '3000');
 app.set('port', port);
 
