@@ -25,7 +25,7 @@ router.get('/${id}', function(req, res, next) {
 });
 
 router.post('/', function(req, res, next) {
-  Repairs.addreview(req.body)
+  Reviews.addreview(req.body)
     .then(data => res.send(data))
     .catch((err) => {
       console.log(err);
@@ -34,7 +34,7 @@ router.post('/', function(req, res, next) {
 });
 
 router.delete('/${id}', function(req, res, next) {
-  Repairs.deletereview(req.params.id)
+  Reviews.deletereview(req.params.id)
     .then(data => res.send(data))
     .catch((err) => {
       console.log(err);

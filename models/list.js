@@ -2,22 +2,13 @@ const mongoose = require("mongoose");
 
 const listSchema = new mongoose.Schema(
   {
-    id: Number,
     nome: String,
-    acordaos: [acordaolistSchema],
+    acordaos: [{
+      id_acordao: Number,
+      nome: String,
+      data_colocacao: String
+    }],
     data_criacao: String
-  },
-  {
-    collection: "lists",
-  }
-);
-
-const acordaolistSchema = new mongoose.Schema(
-  {
-    id: Number,
-    id_acordao: Number,
-    nome: String,
-    data_colocacao: String
   },
   {
     collection: "lists",
