@@ -37,11 +37,11 @@ const reviewSchema = new mongoose.Schema(
     tribunal_recurso: String,
     processo_tribunal_recurso: String,
     magistrado: String,
-    referencias: referenciasSchema,
+    referencias: String,
     anotacoes_extra: String,
     user: String,
     data_review: String,
-    adicionar: Boolean
+    adicionar: Boolean,
   },
   {
     collection: "reviews",
@@ -69,7 +69,7 @@ const referenciasSchema = new mongoose.Schema(
     jurisprudencia_nacional: [String],
     referencia_doutrina: [String],
     referencia_publicacao: String,
-    recusa_aplicacao: [String]
+    recusa_aplicacao: [String],
   },
   {
     collection: "reviews",

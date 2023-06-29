@@ -37,8 +37,8 @@ const acordaoSchema = new mongoose.Schema(
     tribunal_recurso: String,
     processo_tribunal_recurso: String,
     magistrado: String,
-    referencias: referenciasSchema,
-    anotacoes_extra: String
+    referencias: String,
+    anotacoes_extra: String,
   },
   {
     collection: "acordaos",
@@ -66,7 +66,7 @@ const referenciasSchema = new mongoose.Schema(
     jurisprudencia_nacional: [String],
     referencia_doutrina: [String],
     referencia_publicacao: String,
-    recusa_aplicacao: [String]
+    recusa_aplicacao: [String],
   },
   {
     collection: "acordaos",

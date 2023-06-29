@@ -27,13 +27,12 @@ const userSchema = new mongoose.Schema(
     registeredOn: {
       type: Date,
       required: true,
-      default: Date.now,
+      default: new Date(),
     },
     role: {
       type: String,
       required: true,
       default: "USER",
-      enum: ["USER", "ADMIN", "MODERADOR"],
     },
   },
   {

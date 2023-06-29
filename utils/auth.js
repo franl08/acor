@@ -5,7 +5,7 @@ const dotenv = require("dotenv");
 dotenv.config();
 
 async function hashPassword(password) {
-  return await bcrypt.hash(password, process.env.SALT_ROUNDS);
+  return bcrypt.hashSync(password, bcrypt.genSaltSync(10));
 }
 
 async function comparePasswords(password, hash) {

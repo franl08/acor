@@ -8,6 +8,7 @@ router.post("/", function (req, res, next) {
   User.getByUsername(req.body.username)
     .then(async ({ password, ...user }) => {
       if (password !== undefined) {
+        console.log(user.password);
         if (await auth.comparePasswords(req.body.password, password)) {
           res.send({ token: await auth.getToken(user), user });
         } else {
