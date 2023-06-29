@@ -4,9 +4,9 @@ const Acordao = require("../models/acordao");
 pageSize = 10
 
 module.exports.listacordaos = (page,orderBy,keywords) => {
-    return Acordao
-        .find()
-        .sort(orderBy)
+    if (orderBy == "") {
+      return Acordao
+        .find({}, { processo: 1, data_acordao: 1, url: 1 })
         .skip((page - 1) * pageSize)
         .limit(pageSize)
         .then((res) => {
@@ -16,11 +16,26 @@ module.exports.listacordaos = (page,orderBy,keywords) => {
           console.log(err);
           return err;
         });
+    }
+    else {
+        return Acordao
+            .find({}, { processo: 1, data_acordao: 1, url: 1 })
+            .sort(orderBy)
+            .skip((page - 1) * pageSize)
+            .limit(pageSize)
+            .then((res) => {
+              return res;
+            })
+            .catch((err) => {
+              console.log(err);
+              return err;
+            });
+    }
 }
 
 module.exports.getacordao = (id) => {
     return Acordao
-        .findOne({id : id})
+        .findOne({_id : id})
         .then((res) => {
           return res;
         })
@@ -32,7 +47,6 @@ module.exports.getacordao = (id) => {
 
 module.exports.addacordao = (acordao) => {
     return new Acordao({
-        id: acordao.id,
         processo: acordao.processo,
         relator: acordao.relator,
         descritores: acordao.descritores,
@@ -73,8 +87,7 @@ module.exports.addacordao = (acordao) => {
 };
 
 module.exports.updateacordao = (id,acordao) => {
-    return Acordao.updateOne({id: id}, {
-        id: acordao.id,
+    return Acordao.updateOne({_id: id}, {
         processo: acordao.processo,
         relator: acordao.relator,
         descritores: acordao.descritores,

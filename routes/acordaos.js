@@ -2,7 +2,6 @@ const express = require("express");
 const router = express.Router();
 var Acordaos = require('../controllers/acordao')
 
-/* GET home page. */
 router.get("/", function (req, res, next) {
   let page = req.query.page;
   let orderBy = req.query.orderBy;
