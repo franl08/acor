@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 
 const reviewSchema = new mongoose.Schema(
   {
+    _id : String,
     processo: String,
     id_processo: String,
     relator: String,

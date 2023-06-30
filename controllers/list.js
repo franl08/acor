@@ -38,6 +38,7 @@ module.exports.getlist = (id) => {
 
 module.exports.addlist = (list) => {
     return new List({
+        _id : list._id,
         nome: list.nome,
         acordaos: list.acordaos,
         user_id: list.user_id,

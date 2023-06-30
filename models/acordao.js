@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 
 const acordaoSchema = new mongoose.Schema(
   {
+    _id : String,
     processo: String,
     relator: String,
     descritores: [String],

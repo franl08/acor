@@ -29,7 +29,7 @@ module.exports.listacordaos = (page,orderBy,keywords) => {
 
     const countPromise = Acordao.countDocuments();
 
-    query.sort({ orderBy: 1 }).skip((page - 1) * pageSize).limit(pageSize);
+    query.sort({ [orderBy]: 1 }).skip((page - 1) * pageSize).limit(pageSize);
 
     return Promise.all([query.exec(), countPromise])
         .then(([acordaos, count]) => {
@@ -60,6 +60,7 @@ module.exports.getacordao = (id) => {
 
 module.exports.addacordao = (acordao) => {
     return new Acordao({
+        _id : acordao._id,
         processo: acordao.processo,
         relator: acordao.relator,
         descritores: acordao.descritores,
