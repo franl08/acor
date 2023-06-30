@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 
 const acordaoSchema = new mongoose.Schema(
   {
-    _id : String,
+    _id: String,
     processo: String,
     relator: String,
     descritores: [String],
@@ -57,7 +57,7 @@ const acordaoSchema = new mongoose.Schema(
       jurisprudencia_nacional: [String],
       referencia_doutrina: [String],
       referencia_publicacao: String,
-      recusa_aplicacao: [String]
+      recusa_aplicacao: [String],
     },
     anotacoes_extra: String,
   },
