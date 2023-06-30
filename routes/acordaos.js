@@ -14,7 +14,7 @@ router.get("/", function (req, res, next) {
     });
 });
 
-router.get('/${id}', function(req, res, next) {
+router.get('/:id', function(req, res, next) {
   Acordaos.getacordao(req.params.id)
     .then(data => res.send(data))
     .catch((err) => {
@@ -32,7 +32,7 @@ router.post('/', function(req, res, next) {
     });
 });
 
-router.put('/${acordaoID}', function(req, res, next) {
+router.put('/:acordaoID', function(req, res, next) {
   Acordaos.updateacordao(req.params.acordaoID,req.body)
     .then(data => res.send(data))
     .catch((err) => {

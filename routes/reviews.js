@@ -15,7 +15,7 @@ router.get("/", function (req, res, next) {
     });
 });
 
-router.get('/${id}', function(req, res, next) {
+router.get('/:id', function(req, res, next) {
   Reviews.getreview(req.params.id)
     .then(data => res.send(data))
     .catch((err) => {
@@ -33,7 +33,7 @@ router.post('/', function(req, res, next) {
     });
 });
 
-router.delete('/${id}', function(req, res, next) {
+router.delete('/:id', function(req, res, next) {
   Reviews.deletereview(req.params.id)
     .then(data => res.send(data))
     .catch((err) => {

@@ -2,8 +2,8 @@ const mongoose = require("mongoose");
 
 const reviewSchema = new mongoose.Schema(
   {
-    id: Number,
     processo: String,
+    id_processo: String,
     relator: String,
     descritores: [String],
     n_documento: String,

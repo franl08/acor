@@ -4,9 +4,9 @@ const Review = require("../models/review");
 pageSize = 10
 
 module.exports.listreviews = (page,orderBy,keywords) => {
-    return Review
-        .find()
-        .sort(orderBy)
+    if (orderBy == "") {
+      return Review
+        .find({}, { processo: 1, user: 1, data_review: 1, adicionar: 1 })
         .skip((page - 1) * pageSize)
         .limit(pageSize)
         .then((res) => {
@@ -16,11 +16,26 @@ module.exports.listreviews = (page,orderBy,keywords) => {
           console.log(err);
           return err;
         });
+    }
+    else {
+        return Review
+            .find({}, { processo: 1, user: 1, data_review: 1, adicionar: 1 })
+            .sort(orderBy)
+            .skip((page - 1) * pageSize)
+            .limit(pageSize)
+            .then((res) => {
+              return res;
+            })
+            .catch((err) => {
+              console.log(err);
+              return err;
+            });
+    }
 }
 
 module.exports.getreview = (id) => {
     return Review
-        .findOne({id : id})
+        .findOne({_id : id})
         .then((res) => {
           return res;
         })
@@ -32,7 +47,6 @@ module.exports.getreview = (id) => {
 
 module.exports.addreview = (review) => {
     return new Review({
-        id: review.id,
         processo: review.processo,
         relator: review.relator,
         descritores: review.descritores,
@@ -77,5 +91,5 @@ module.exports.addreview = (review) => {
 
 module.exports.deletereview = (id) => {
     return Review
-    .findOneAndDelete({id: id})
+    .findOneAndDelete({_id: id})
 }

@@ -5,12 +5,16 @@ const listSchema = new mongoose.Schema(
     nome: String,
     acordaos: [
       {
-        id_acordao: Number,
-        nome: String,
-        data_colocacao: String,
+        id_acordao: String,
+        processo: String,
+        url: String,
+        tribunal: String,
+        data_colocacao: String
       },
     ],
+    user_id: String,
     data_criacao: String,
+    descricao: String
   },
   {
     collection: "lists",
