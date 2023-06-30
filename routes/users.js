@@ -5,15 +5,38 @@ const User = require("../controllers/user");
 
 /* GET user by username. */
 router.get("/:username", function (req, res, next) {
-  console.log(req.params.username);
-  User.getByUsername(req.params.username).then((user) => {
-    if (user) {
-      console.log(user);
-      res.send(user);
-    } else {
-      next("User not found");
-    }
-  });
+  const { username } = auth.userClaimsFromToken(
+    auth.extractTokenFromHeaders(req.headers)
+  );
+  console.log(username);
+  if (username !== req.params.username) {
+    User.getByUsername(username).then((user) => {
+      if (user && user.role === "ADMIN") {
+        User.getByUsername(req.params.username).then((user) => {
+          if (user) {
+            console.log(user);
+            res.send(user);
+          } else {
+            res.status(404);
+            next("User not found");
+          }
+        });
+      } else {
+        res.status(401);
+        next("Unauthorized");
+      }
+    });
+  } else {
+    User.getByUsername(req.params.username).then((user) => {
+      if (user) {
+        console.log(user);
+        res.send(user);
+      } else {
+        res.status(404);
+        next("User not found");
+      }
+    });
+  }
 });
 
 /* POST to add user */
@@ -21,11 +44,13 @@ router.post("/", function (req, res, next) {
   User.getByUsername(req.body.username).then(async (user) => {
     if (user) {
       console.log(user);
+      res.status(409);
       next("Username already exists");
     } else {
       User.getByEmail(req.body.email).then(async (user) => {
         if (user) {
           console.log(user);
+          res.status(409);
           next("Email already exists");
         } else {
           User.createUser(req.body)
@@ -34,6 +59,7 @@ router.post("/", function (req, res, next) {
               res.send({ token: await auth.getToken(user), user });
             })
             .catch((err) => {
+              res.status(500);
               next(err);
             });
         }
@@ -42,8 +68,61 @@ router.post("/", function (req, res, next) {
   });
 });
 
+/* PUT to promote user by username */
+router.put("/promote/:username", function (req, res, next) {
+  const { username } = auth.userClaimsFromToken(
+    auth.extractTokenFromHeaders(req.headers)
+  );
+  //console.log(username);
+  User.getByUsername(username).then((user) => {
+    console.log(user);
+    if (user && user.role === "ADMIN") {
+      User.promoteUser(req.params.username)
+        .then((user) => {
+          res.send(user);
+        })
+        .catch((err) => {
+          res.status(500);
+          next(err);
+        });
+    } else {
+      res.status(401);
+      next("Unauthorized");
+    }
+  });
+});
+
+/* PUT to demote user by username */
+router.put("/demote/:username", function (req, res, next) {
+  const { username } = auth.userClaimsFromToken(
+    auth.extractTokenFromHeaders(req.headers)
+  );
+  User.getByUsername(username).then((user) => {
+    if (user && user.role === "ADMIN") {
+      User.demoteUser(req.params.username)
+        .then((user) => {
+          res.send(user);
+        })
+        .catch((err) => {
+          res.status(500);
+          next(err);
+        });
+    } else {
+      res.status(401);
+      next("Unauthorized");
+    }
+  });
+});
+
 /* PUT to update user by username */
 router.put("/:username", function (req, res, next) {
+  if (
+    auth.userClaimsFromToken(auth.extractTokenFromHeaders(req.headers))
+      .username !== req.params.username
+  ) {
+    res.status(401);
+    next("Unauthorized");
+  }
   if (req.body.password) {
     req.body.password = auth.hashPassword(req.body.password).then((hash) => {
       req.body.password = hash;
@@ -52,6 +131,7 @@ router.put("/:username", function (req, res, next) {
           res.send(user);
         })
         .catch((err) => {
+          res.status(500);
           next(err);
         });
     });
@@ -61,6 +141,7 @@ router.put("/:username", function (req, res, next) {
         res.send(user);
       })
       .catch((err) => {
+        res.status(500);
         next(err);
       });
   }
@@ -68,13 +149,23 @@ router.put("/:username", function (req, res, next) {
 
 /* DELETE to delete user by username */
 router.delete("/:username", function (req, res, next) {
-  User.deleteUser(req.params.username)
-    .then((user) => {
-      res.send(user);
-    })
-    .catch((err) => {
-      next(err);
-    });
+  const { username } = auth.userClaimsFromToken(
+    auth.extractTokenFromHeaders(req.headers)
+  );
+  User.getByUsername(username).then((user) => {
+    if (user && user.role === "ADMIN") {
+      User.deleteUser(req.params.username)
+        .then((user) => {
+          res.send(user);
+        })
+        .catch((err) => {
+          next(err);
+        });
+    } else {
+      res.status(401);
+      next("Unauthorized");
+    }
+  });
 });
 
 module.exports = router;

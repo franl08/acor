@@ -3,11 +3,8 @@ const User = require("../models/user");
 
 async function getByUsername(username) {
   try {
-    console.log("username", username);
     const user = await User.findOne({ username: username });
-    console.log(user);
     if (user) {
-      console.log(user.toJSON());
       return user.toJSON();
     }
     return user;
@@ -33,7 +30,6 @@ async function createUser(user) {
     user.role = "USER";
     user.registeredOn = new Date();
     user.password = await auth.hashPassword(user.password);
-    console.log(user);
     let res = await new User({
       username: user.username,
       firstname: user.firstname,
@@ -42,10 +38,35 @@ async function createUser(user) {
       role: user.role,
       password: user.password,
     }).save();
-    console.log(res);
     return res.toJSON();
   } catch (err) {
     console.log(err);
+    return err;
+  }
+}
+
+async function promoteUser(username) {
+  try {
+    const res = User.findOneAndUpdate(
+      { username: username },
+      { role: "MODERADOR" },
+      { new: true }
+    );
+    return res.toJSON();
+  } catch (err) {
+    return err;
+  }
+}
+
+async function demoteUser(username) {
+  try {
+    const res = User.findOneAndUpdate(
+      { username: username },
+      { role: "USER" },
+      { new: true }
+    );
+    return res.toJSON();
+  } catch (err) {
     return err;
   }
 }
@@ -90,4 +111,6 @@ module.exports = {
   updateUser,
   getUserTypeFromUsername,
   getByEmail,
+  promoteUser,
+  demoteUser,
 };
