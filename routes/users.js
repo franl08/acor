@@ -18,7 +18,7 @@ router.get("/:username", function (req, res, next) {
             res.send(user);
           } else {
             res.status(404);
-            next("User not found");
+            next({ status: 404, response: "User not found" });
           }
         });
       } else {
@@ -70,18 +70,19 @@ router.post("/", function (req, res, next) {
 
 /* PUT to promote user by username */
 router.put("/promote/:username", function (req, res, next) {
+  console.log(req.headers);
   const { username } = auth.userClaimsFromToken(
     auth.extractTokenFromHeaders(req.headers)
   );
   //console.log(username);
   User.getByUsername(username).then((user) => {
-    console.log(user);
     if (user && user.role === "ADMIN") {
       User.promoteUser(req.params.username)
         .then((user) => {
           res.send(user);
         })
         .catch((err) => {
+          console.log(err);
           res.status(500);
           next(err);
         });
@@ -117,7 +118,7 @@ router.put("/demote/:username", function (req, res, next) {
 /* PUT to update user by username */
 router.put("/:username", function (req, res, next) {
   if (
-    auth.userClaimsFromToken(auth.extractTokenFromHeaders(req.headers))
+    auth.userClaimsFromToken(auth.extractTokenFromHeaders(req.body.headers))
       .username !== req.params.username
   ) {
     res.status(401);
