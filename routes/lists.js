@@ -4,8 +4,9 @@ var Lists = require('../controllers/list')
 
 /* GET home page. */
 router.get("/", function (req, res, next) {
-  let user_id = req.query.user_id;
+  let username = req.query.username;
   let listId = req.query.listId;
+  let page = req.query.page;
   if (listId) {
     Lists.getlist(listId)
       .then(data => res.send(data))
@@ -15,7 +16,7 @@ router.get("/", function (req, res, next) {
       });
   }
   else {
-    Lists.listlistsbyuserid(user_id)
+    Lists.listlistsbyusername(page,username)
       .then(data => res.send(data))
       .catch((err) => {
         console.log(err);
@@ -47,9 +48,6 @@ router.post('/', function(req, res, next) {
 
 
 router.delete('/', function(req, res, next) {
-  console.log("HEYY")
-  console.log(req.query.acordaoId)
-  console.log(req.query.listId)
   let acordaoId = req.query.acordaoId;
   let listId = req.query.listId;
   Lists.deleteacordaofromlist(listId,acordaoId)

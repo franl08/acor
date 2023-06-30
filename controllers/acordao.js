@@ -4,33 +4,46 @@ const Acordao = require("../models/acordao");
 pageSize = 10
 
 module.exports.listacordaos = (page,orderBy,keywords) => {
-    if (orderBy == "") {
-      return Acordao
-        .find({}, { processo: 1, data_acordao: 1, url: 1 })
-        .skip((page - 1) * pageSize)
-        .limit(pageSize)
-        .then((res) => {
-          return res;
+  if (orderBy == "") {
+    const query = Acordao.find({}, { processo: 1, data_acordao: 1, url: 1 });
+
+    const countPromise = Acordao.countDocuments();
+
+    query.skip((page - 1) * pageSize).limit(pageSize);
+
+    return Promise.all([query.exec(), countPromise])
+        .then(([acordaos, count]) => {
+        return {
+            acordaos: acordaos,
+            totalItem: count,
+            itemsPerPage: pageSize,
+        };
         })
         .catch((err) => {
-          console.log(err);
-          return err;
+            console.log(err);
+            return err;
         });
-    }
-    else {
-        return Acordao
-            .find({}, { processo: 1, data_acordao: 1, url: 1 })
-            .sort(orderBy)
-            .skip((page - 1) * pageSize)
-            .limit(pageSize)
-            .then((res) => {
-              return res;
-            })
-            .catch((err) => {
-              console.log(err);
-              return err;
-            });
-    }
+  }
+  else {
+    const query = Acordao.find({}, { processo: 1, data_acordao: 1, url: 1 });
+
+    const countPromise = Acordao.countDocuments();
+
+    query.sort({ orderBy: 1 }).skip((page - 1) * pageSize).limit(pageSize);
+
+    return Promise.all([query.exec(), countPromise])
+        .then(([acordaos, count]) => {
+        return {
+            acordaos: acordaos,
+            totalItem: count,
+            itemsPerPage: pageSize,
+        };
+        })
+        .catch((err) => {
+            console.log(err);
+            return err;
+        });
+  }
 }
 
 module.exports.getacordao = (id) => {

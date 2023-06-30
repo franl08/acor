@@ -5,31 +5,44 @@ pageSize = 10
 
 module.exports.listreviews = (page,orderBy,keywords) => {
     if (orderBy == "") {
-      return Review
-        .find({}, { processo: 1, user: 1, data_review: 1, adicionar: 1 })
-        .skip((page - 1) * pageSize)
-        .limit(pageSize)
-        .then((res) => {
-          return res;
-        })
-        .catch((err) => {
-          console.log(err);
-          return err;
-        });
-    }
-    else {
-        return Review
-            .find({}, { processo: 1, user: 1, data_review: 1, adicionar: 1 })
-            .sort(orderBy)
-            .skip((page - 1) * pageSize)
-            .limit(pageSize)
-            .then((res) => {
-              return res;
-            })
-            .catch((err) => {
+      const query = Review.find({}, { processo: 1, user: 1, data_review: 1, adicionar: 1 });
+
+      const countPromise = Review.countDocuments();
+  
+      query.skip((page - 1) * pageSize).limit(pageSize);
+  
+      return Promise.all([query.exec(), countPromise])
+          .then(([reviews, count]) => {
+          return {
+              reviews: reviews,
+              totalItem: count,
+              itemsPerPage: pageSize,
+          };
+          })
+          .catch((err) => {
               console.log(err);
               return err;
-            });
+          });
+    }
+    else {
+      const query = Review.find({}, { processo: 1, user: 1, data_review: 1, adicionar: 1 });
+
+      const countPromise = Review.countDocuments();
+  
+      query.sort({ orderBy: 1 }).skip((page - 1) * pageSize).limit(pageSize);
+  
+      return Promise.all([query.exec(), countPromise])
+          .then(([reviews, count]) => {
+          return {
+              reviews: reviews,
+              totalItem: count,
+              itemsPerPage: pageSize,
+          };
+          })
+          .catch((err) => {
+              console.log(err);
+              return err;
+          });
     }
 }
 

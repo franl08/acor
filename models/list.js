@@ -12,7 +12,7 @@ const listSchema = new mongoose.Schema(
         data_colocacao: String
       },
     ],
-    user_id: String,
+    username: String,
     data_criacao: String,
     descricao: String
   },

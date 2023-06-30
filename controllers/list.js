@@ -1,15 +1,26 @@
 const mongoose = require("mongoose");
 const List = require("../models/list");
 
-module.exports.listlistsbyuserid = (user_id) => {
-    return List
-        .find({user_id : user_id})
-        .then((res) => {
-          return res;
+pageSize = 10
+
+module.exports.listlistsbyusername = (page,username) => {
+    const query = List.find({ username: username });
+
+    const countPromise = List.countDocuments({ username: username });
+
+    query.skip((page - 1) * pageSize).limit(pageSize);
+
+    return Promise.all([query.exec(), countPromise])
+        .then(([lists, count]) => {
+        return {
+            lists: lists,
+            totalItem: count,
+            itemsPerPage: pageSize,
+        };
         })
         .catch((err) => {
-          console.log(err);
-          return err;
+            console.log(err);
+            return err;
         });
 }
 
