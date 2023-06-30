@@ -47,7 +47,7 @@ async function createUser(user) {
 
 async function promoteUser(username) {
   try {
-    const res = User.findOneAndUpdate(
+    const res = await User.findOneAndUpdate(
       { username: username },
       { role: "MODERADOR" },
       { new: true }
@@ -60,7 +60,7 @@ async function promoteUser(username) {
 
 async function demoteUser(username) {
   try {
-    const res = User.findOneAndUpdate(
+    const res = await User.findOneAndUpdate(
       { username: username },
       { role: "USER" },
       { new: true }
