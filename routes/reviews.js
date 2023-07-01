@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+const axios = require("axios");
 var Reviews = require('../controllers/review')
 
 /* GET home page. */
@@ -31,6 +32,26 @@ router.post('/', function(req, res, next) {
       console.log(err);
       res.status(500).send(`Erro ao acrescentar uma review à BD: ${err}`);
     });
+});
+
+router.post('/accept/:id', function(req, res, next) {
+  accept = req.body.adicionar
+  if (accept) {
+    axios.post('/', req.body)
+      .then(data => res.send(data))
+      .catch((err) => {
+        console.log(err);
+        res.status(500).send(`Erro ao acrescentar uma review à BD: ${err}`);
+      });
+  }
+  else {
+    axios.put('/${req.params.id}',req.body)
+      .then(data => res.send(data))
+      .catch((err) => {
+        console.log(err);
+        res.status(500).send(`Erro ao acrescentar uma review à BD: ${err}`);
+      });
+  }
 });
 
 router.delete('/:id', function(req, res, next) {
