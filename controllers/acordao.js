@@ -1,64 +1,71 @@
 const mongoose = require("mongoose");
 const Acordao = require("../models/acordao");
 
-pageSize = 10;
+pageSize = 5;
 
-module.exports.listacordaos = (page, orderBy, keywords) => {
-  if (orderBy == "") {
-    if (keywords == "") {
-      const query = Acordao.find({}, { processo: 1, data_acordao: 1, url: 1 });
-    }
-    else {
-      const query = Acordao.find({
-        $text: { $search: keywords },
-        $or: [
-          { meio_processual: { $regex: keywords, $options: "i" } },
-          { descritores: { $in: [/keywords/i] } },
-          { area_tematica_1: { $in: [/keywords/i] } },
-          { area_tematica_2: { $in: [/keywords/i] } }
-        ]
-      })
-    }
-    const countPromise = Acordao.countDocuments();
+module.exports.listacordaos = (queryBody) => {
 
-    query.skip((page - 1) * pageSize).limit(pageSize);
+  let page = queryBody.page;
+  let orderBy = queryBody.orderBy;
+  let keywords = queryBody.keywords;
+  let query;
+  console.log(keywords)
+  if (keywords == null) {
+    query = Acordao.find({}, { processo: 1, data_acordao: 1, url: 1 });
   }
   else {
-    if (keywords == "") {
-      const query = Acordao.find({}, { processo: 1, data_acordao: 1, url: 1 });
+    keywords = keywords.replace(/"/g, '');
+    query = Acordao.find({
+      $text: { $search: keywords },
+      $or: [
+        { meio_processual: { $regex: new RegExp(keywords, "i") } },
+        { descritores: { $in: [new RegExp(keywords, "i")] } },
+        { area_tematica_1: { $in: [new RegExp(keywords, "i")] } },
+        { area_tematica_2: { $in: [new RegExp(keywords, "i")] } }
+      ]
+    }, { processo: 1, data_acordao: 1, url: 1 });
+  }
+  query.skip((page - 1) * pageSize).limit(pageSize);
+  if (orderBy != null) {
+    let sortOrder
+    params = orderBy.split(";")
+    if (params[1] == "asc") {
+      sortOrder = 1
     }
     else {
-      const query = Acordao.find({
-        $text: { $search: keywords },
-        $or: [
-          { meio_processual: { $regex: keywords, $options: "i" } },
-          { descritores: { $in: [/keywords/i] } },
-          { area_tematica_1: { $in: [/keywords/i] } },
-          { area_tematica_2: { $in: [/keywords/i] } }
-        ]
-      }, { processo: 1, data_acordao: 1, url: 1 })
+      sortOrder = -1
     }
-
-    const countPromise = Acordao.countDocuments();
-
     query
-      .sort({ [orderBy]: 1 })
+      .sort({ [params[0]]: sortOrder })
       .skip((page - 1) * pageSize)
       .limit(pageSize);
-
-    return Promise.all([query.exec(), countPromise])
-      .then(([acordaos, count]) => {
-        return {
-          acordaos: acordaos,
-          totalItem: count,
-          itemsPerPage: pageSize,
-        };
-      })
-      .catch((err) => {
-        console.log(err);
-        return err;
-      });
   }
+  
+
+  for (let q in queryBody) {
+    if (q != "page" && q != "orderBy" && q != "keywords") {
+
+      queryBody[q] = queryBody[q].replace(/"/g, '');
+      query.find({ [q]: queryBody[q] });
+    }
+
+  }
+
+  
+
+
+  return query.exec()
+  .then((acordaos) => {
+    return {
+      acordaos: acordaos,
+      totalItem: acordaos.length,
+      itemsPerPage: pageSize,
+    };
+  })
+  .catch((err) => {
+    console.log(err);
+    return err;
+  });
 };
 
 module.exports.getacordao = (id) => {

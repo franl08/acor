@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const Review = require("../models/review");
 
-pageSize = 10;
+pageSize = 5;
 
 module.exports.listreviews = (page, orderBy, keywords) => {
   if (orderBy == "") {

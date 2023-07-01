@@ -3,11 +3,11 @@ const router = express.Router();
 var Acordaos = require('../controllers/acordao')
 
 router.get("/", function (req, res, next) {
-  let page = req.query.page;
-  let orderBy = req.query.orderBy;
-  let keywords = req.query.keywords;
-  Acordaos.listacordaos(page,orderBy,keywords)
-    .then(data => res.send(data))
+  console.dir(req.query)
+  Acordaos.listacordaos(req.query)
+    .then(data => {
+      res.send(data)
+    })
     .catch((err) => {
       console.log(err);
       res.status(500).send(`Erro na listagem dos acórdãos: ${err}`);

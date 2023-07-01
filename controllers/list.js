@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const List = require("../models/list");
 
-pageSize = 10;
+pageSize = 5;
 
 module.exports.listlistsbyusername = (page, username) => {
   const query = List.find({ username: username },{ nome: 1});
