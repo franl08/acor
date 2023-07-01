@@ -9,12 +9,10 @@ const listSchema = new mongoose.Schema(
         id_acordao: String,
         processo: String,
         url: String,
-        tribunal: String,
-        data_colocacao: String
+        tribunal: String
       },
     ],
     username: String,
-    data_criacao: String,
     descricao: String
   },
   {

@@ -4,7 +4,7 @@ const List = require("../models/list");
 pageSize = 10;
 
 module.exports.listlistsbyusername = (page, username) => {
-  const query = List.find({ username: username });
+  const query = List.find({ username: username },{ nome: 1});
 
   const countPromise = List.countDocuments({ username: username });
 
