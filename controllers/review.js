@@ -68,6 +68,7 @@ module.exports.getreview = (id) => {
 module.exports.addreview = (review) => {
   return new Review({
     processo: review.processo,
+    id_acordao: review.id_acordao,
     relator: review.relator,
     descritores: review.descritores,
     n_documento: review.n_documento,

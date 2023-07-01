@@ -69,6 +69,7 @@ module.exports.listacordaos = (queryBody) => {
 };
 
 module.exports.getacordao = (id) => {
+  console.log(id)
   return Acordao.findOne({ _id: id })
     .then((res) => {
       return res;

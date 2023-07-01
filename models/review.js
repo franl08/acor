@@ -2,9 +2,8 @@ const mongoose = require("mongoose");
 
 const reviewSchema = new mongoose.Schema(
   {
-    _id : String,
     processo: String,
-    id_processo: String,
+    id_acordao: String,
     relator: String,
     descritores: [String],
     n_documento: String,
@@ -62,7 +61,7 @@ const reviewSchema = new mongoose.Schema(
     },
     anotacoes_extra: String,
     user: String,
-    data_review: String,
+    data_review: {type: Date, default: Date.now},
     adicionar: Boolean,
   },
   {

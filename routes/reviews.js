@@ -34,25 +34,76 @@ router.post('/', function(req, res, next) {
     });
 });
 
+//router.post('/accept/:id', function(req, res, next) {
+//  axios.get(`http://localhost:5555/reviews/${req.params.id}`)
+//    .then(res => {
+//      const review = res.data;
+//
+//      if (review.adicionar) {
+//        axios.post('http://localhost:5555/acordaos', review)
+//          .then(data => res.send(data))
+//          .catch((err) => {
+//            console.log(err);
+//            res.status(500).send(`Erro ao acrescentar uma review à BD: ${err}`);
+//          });
+//      }
+//      else {
+//        axios.put(`http://localhost:5555/acordaos/${review.id_acordao}`, review)
+//          .then(data => res.send(data))
+//          .catch((err) => {
+//            console.log(err);
+//            res.status(500).send(`Erro ao acrescentar uma review à BD: ${err}`);
+//          });
+//      }
+//    })
+//    .catch((err) => {
+//      console.log(err);
+//      res.status(500).send(`Erro ao mostrar a review: ${err}`);
+//    });
+//
+//    axios.delete(`http://localhost:5555/reviews/${req.params.id}`)
+//      .then(data => res.send(data))
+//      .catch((err) => {
+//        console.log(err);
+//        res.status(500).send(`Erro ao eliminar a review da BD: ${err}`);
+//      }
+//    );
+//});
+
 router.post('/accept/:id', function(req, res, next) {
-  accept = req.body.adicionar
-  if (accept) {
-    axios.post('/', req.body)
-      .then(data => res.send(data))
-      .catch((err) => {
-        console.log(err);
-        res.status(500).send(`Erro ao acrescentar uma review à BD: ${err}`);
-      });
-  }
-  else {
-    axios.put('/${req.params.id}',req.body)
-      .then(data => res.send(data))
-      .catch((err) => {
-        console.log(err);
-        res.status(500).send(`Erro ao acrescentar uma review à BD: ${err}`);
-      });
-  }
+  const reviewId = req.params.id;
+  const reviewPromise = axios.get(`http://localhost:5555/reviews/${reviewId}`)
+    .then(response => {
+      const review = response.data;
+
+      if (review.adicionar) {
+        return axios.post('http://localhost:5555/acordaos', review);
+      } else {
+        console.log(review.id_acordao);
+        return axios.put(`http://localhost:5555/acordaos/${review.id_acordao}`, review);
+      }
+    })
+    .catch((err) => {
+      console.log(err);
+      res.status(500).send(`Erro ao mostrar a review: ${err}`);
+    });
+
+  const deletePromise = axios.delete(`http://localhost:5555/reviews/${reviewId}`)
+    .catch((err) => {
+      console.log(err);
+      res.status(500).send(`Erro ao eliminar a review da BD: ${err}`);
+    });
+
+  Promise.all([reviewPromise, deletePromise])
+    .then(([reviewResult, deleteResult]) => {
+      res.send({ review: reviewResult.data, delete: deleteResult.data });
+    })
+    .catch((err) => {
+      console.log(err);
+      res.status(500).send(`Erro ao processar as requisições: ${err}`);
+    });
 });
+
 
 router.delete('/:id', function(req, res, next) {
   Reviews.deletereview(req.params.id)
