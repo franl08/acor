@@ -5,45 +5,58 @@ pageSize = 10
 
 module.exports.listacordaos = (page,orderBy,keywords) => {
   if (orderBy == "") {
-    const query = Acordao.find({}, { processo: 1, data_acordao: 1, url: 1 });
-
+    if (keywords == "") {
+      const query = Acordao.find({}, { processo: 1, data_acordao: 1, url: 1 });
+    }
+    else {
+      const query = Acordao.find({
+        $text: { $search: keywords },
+        $or: [
+          { meio_processual: { $regex: keywords, $options: "i" } },
+          { descritores: { $in: [/keywords/i] } },
+          { area_tematica_1: { $in: [/keywords/i] } },
+          { area_tematica_2: { $in: [/keywords/i] } }
+        ]
+      })
+    }
     const countPromise = Acordao.countDocuments();
 
     query.skip((page - 1) * pageSize).limit(pageSize);
-
-    return Promise.all([query.exec(), countPromise])
-        .then(([acordaos, count]) => {
-        return {
-            acordaos: acordaos,
-            totalItem: count,
-            itemsPerPage: pageSize,
-        };
-        })
-        .catch((err) => {
-            console.log(err);
-            return err;
-        });
   }
   else {
-    const query = Acordao.find({}, { processo: 1, data_acordao: 1, url: 1 });
+    if (keywords == "") {
+      const query = Acordao.find({}, { processo: 1, data_acordao: 1, url: 1 });
+    }
+    else {
+      const query = Acordao.find({
+        $text: { $search: keywords },
+        $or: [
+          { meio_processual: { $regex: keywords, $options: "i" } },
+          { descritores: { $in: [/keywords/i] } },
+          { area_tematica_1: { $in: [/keywords/i] } },
+          { area_tematica_2: { $in: [/keywords/i] } }
+        ]
+      }, { processo: 1, data_acordao: 1, url: 1 })
+    }
 
     const countPromise = Acordao.countDocuments();
 
     query.sort({ [orderBy]: 1 }).skip((page - 1) * pageSize).limit(pageSize);
 
-    return Promise.all([query.exec(), countPromise])
-        .then(([acordaos, count]) => {
-        return {
-            acordaos: acordaos,
-            totalItem: count,
-            itemsPerPage: pageSize,
-        };
-        })
-        .catch((err) => {
-            console.log(err);
-            return err;
-        });
   }
+
+  return Promise.all([query.exec(), countPromise])
+      .then(([acordaos, count]) => {
+      return {
+          acordaos: acordaos,
+          totalItem: count,
+          itemsPerPage: pageSize,
+      };
+      })
+      .catch((err) => {
+          console.log(err);
+          return err;
+      });
 }
 
 module.exports.getacordao = (id) => {
