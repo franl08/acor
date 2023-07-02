@@ -75,7 +75,7 @@ Depois de analisar os vários datasets disponibilizados pelo docente, conclui-se
 
 ## Frontend
 
-Para o Frontend, escolheu-se utilizar a framework para criar Web Apps [SvelteKit](https://kit.svelte.dev/). Esta é baseada em Svelte, uma framework de Javascript que difere de outras por ser um compilador e não apenas uma runtime library. O código é compilado durante o build time em vez de executar do lado do cliente. Desta forma, menos código é enviado para o lado do cliente e maior é a performace.
+Para o Frontend, escolheu-se utilizar a framework para criar Web Apps [SvelteKit](https://kit.svelte.dev/). Esta é baseada em Svelte, uma framework de Javascript que difere de outras por ser um compilador e não apenas uma runtime library. O código é compilado durante o build time em vez de executar do lado do cliente. Desta forma, menos código é enviado para o lado do cliente e maior é a performace. Para além disso, permite ainda adicionar reatividade à aplicação.
 
 Foram criados vários módulos onde cada possui um ficheiro denominado por "+page.svelte" contendo o código para a criação das páginas. O seguintes módulos e sub-módulos foram criados para apresentar as diversas funcionalidades:
 
