@@ -9,7 +9,7 @@ module.exports.listacordaos = (queryBody) => {
   let keywords = queryBody.keywords;
   let query;
   console.log(keywords);
-  if (keywords == null) {
+  if (!keywords || keywords == "") {
     query = Acordao.find({}, { processo: 1, data_acordao: 1, url: 1 });
   } else {
     keywords = keywords.replace(/"/g, "");
