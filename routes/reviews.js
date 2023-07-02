@@ -77,10 +77,24 @@ router.post('/accept/:id', function(req, res, next) {
       const review = response.data;
 
       if (review.adicionar) {
-        return axios.post('http://localhost:5555/acordaos', review);
+        return axios.post('http://localhost:5555/acordaos', review)
+          .then(reviewResponse => {
+            // Execute the delete operation after the POST operation
+            return axios.delete(`http://localhost:5555/reviews/${reviewId}`)
+              .then(deleteResponse => {
+                return { review: reviewResponse.data, delete: deleteResponse.data };
+              });
+          });
       } else {
         console.log(review.id_acordao);
-        return axios.put(`http://localhost:5555/acordaos/${review.id_acordao}`, review);
+        return axios.put(`http://localhost:5555/acordaos/${review.id_acordao}`, review)
+          .then(reviewResponse => {
+            // Execute the delete operation after the PUT operation
+            return axios.delete(`http://localhost:5555/reviews/${reviewId}`)
+              .then(deleteResponse => {
+                return { review: reviewResponse.data, delete: deleteResponse.data };
+              });
+          });
       }
     })
     .catch((err) => {
@@ -88,21 +102,16 @@ router.post('/accept/:id', function(req, res, next) {
       res.status(500).send(`Erro ao mostrar a review: ${err}`);
     });
 
-  const deletePromise = axios.delete(`http://localhost:5555/reviews/${reviewId}`)
-    .catch((err) => {
-      console.log(err);
-      res.status(500).send(`Erro ao eliminar a review da BD: ${err}`);
-    });
-
-  Promise.all([reviewPromise, deletePromise])
-    .then(([reviewResult, deleteResult]) => {
-      res.send({ review: reviewResult.data, delete: deleteResult.data });
+  reviewPromise
+    .then(result => {
+      res.send(result);
     })
     .catch((err) => {
       console.log(err);
       res.status(500).send(`Erro ao processar as requisições: ${err}`);
     });
 });
+
 
 
 router.delete('/:id', function(req, res, next) {

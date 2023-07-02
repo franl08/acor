@@ -8,7 +8,6 @@ module.exports.listacordaos = (queryBody) => {
   let orderBy = queryBody.orderBy;
   let keywords = queryBody.keywords;
   let query;
-  console.log(keywords);
   if (!keywords || keywords == "") {
     query = Acordao.find({}, { processo: 1, data_acordao: 1, url: 1 });
   } else {
@@ -26,6 +25,19 @@ module.exports.listacordaos = (queryBody) => {
       { processo: 1, data_acordao: 1, url: 1 }
     );
   }
+
+  for (let q in queryBody) {
+    if (q != "page" && q != "orderBy" && q != "keywords") {
+      queryBody[q] = queryBody[q].replace(/"/g, "");
+      query.find({ [q]: queryBody[q] });
+    }
+  }
+
+
+  let count = query.clone();
+  count.countDocuments()
+  
+  
   query.skip((page - 1) * pageSize).limit(pageSize);
   if (orderBy != null) {
     let sortOrder;
@@ -41,26 +53,39 @@ module.exports.listacordaos = (queryBody) => {
       .limit(pageSize);
   }
 
-  for (let q in queryBody) {
-    if (q != "page" && q != "orderBy" && q != "keywords") {
-      queryBody[q] = queryBody[q].replace(/"/g, "");
-      query.find({ [q]: queryBody[q] });
-    }
-  }
 
-  return query
-    .exec()
-    .then((acordaos) => {
-      return {
-        acordaos: acordaos,
-        totalItem: acordaos.length,
-        itemsPerPage: pageSize,
-      };
-    })
-    .catch((err) => {
-      console.log(err);
-      return err;
-    });
+
+
+  return count.exec()
+  .then((count) => {
+    return query
+      .exec()
+      .then((acordaos) => {
+        return {
+          acordaos: acordaos,
+          totalItem: count,
+          itemsPerPage: pageSize,
+        };
+      }
+    )
+  })
+  .catch((err) => {
+    console.log(err);
+    return err;
+  });
+  //return query
+  //  .exec()
+  //  .then((acordaos) => {
+  //    return {
+  //      acordaos: acordaos,
+  //      totalItem: totalItem,
+  //      itemsPerPage: pageSize,
+  //    };
+  //  })
+  //  .catch((err) => {
+  //    console.log(err);
+  //    return err;
+  //  });
 };
 
 module.exports.getacordao = (id) => {
