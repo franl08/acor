@@ -117,8 +117,9 @@ router.put("/demote/:username", function (req, res, next) {
 
 /* PUT to update user by username */
 router.put("/:username", function (req, res, next) {
+  console.log("Entrei");
   if (
-    auth.userClaimsFromToken(auth.extractTokenFromHeaders(req.body.headers))
+    auth.userClaimsFromToken(auth.extractTokenFromHeaders(req.headers))
       .username !== req.params.username
   ) {
     res.status(401);
@@ -132,16 +133,19 @@ router.put("/:username", function (req, res, next) {
           res.send(user);
         })
         .catch((err) => {
+          console.log(err);
           res.status(500);
           next(err);
         });
     });
   } else {
+    console.log(req.body);
     User.updateUser(req.params.username, req.body)
       .then((user) => {
         res.send(user);
       })
       .catch((err) => {
+        console.log(err);
         res.status(500);
         next(err);
       });

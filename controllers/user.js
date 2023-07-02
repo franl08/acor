@@ -30,14 +30,7 @@ async function createUser(user) {
     user.role = "USER";
     user.registeredOn = new Date();
     user.password = await auth.hashPassword(user.password);
-    let res = await new User({
-      username: user.username,
-      firstname: user.firstname,
-      lastname: user.lastname,
-      email: user.email,
-      role: user.role,
-      password: user.password,
-    }).save();
+    let res = await new User({ ...user }).save();
     return res.toJSON();
   } catch (err) {
     console.log(err);
@@ -84,7 +77,7 @@ async function updateUser(username, user) {
   try {
     const res = User.findOneAndUpdate(
       { username: username },
-      { $set: user },
+      { $set: { ...user } },
       {
         new: true,
       }

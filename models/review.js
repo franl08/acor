@@ -61,7 +61,7 @@ const reviewSchema = new mongoose.Schema(
     },
     anotacoes_extra: String,
     user: String,
-    data_review: {type: Date, default: Date.now},
+    data_review: { type: Date, default: new Date() },
     adicionar: Boolean,
   },
   {
