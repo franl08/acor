@@ -24,12 +24,7 @@ module.exports.getlist = (id) => {
 };
 
 module.exports.addlist = (list) => {
-  return new List({
-    nome: list.nome,
-    acordaos: [],
-    username: list.username,
-    descricao: list.descricao,
-  }).save();
+  return new List({ ...list }).save();
 };
 
 module.exports.addacordao = (listId, ac) => {
