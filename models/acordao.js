@@ -65,4 +65,10 @@ const acordaoSchema = new mongoose.Schema(
   }
 );
 
+// Create indexes
+acordaoSchema.index({ meio_processual: "text" });
+acordaoSchema.index({ descritores: 1 });
+acordaoSchema.index({ area_tematica_1: 1 });
+acordaoSchema.index({ area_tematica_2: 1 });
+
 module.exports = mongoose.model("acordao", acordaoSchema);

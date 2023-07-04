@@ -2,24 +2,53 @@ const mongoose = require("mongoose");
 const Acordao = require("../models/acordao");
 
 pageSize = 5;
+totalItems = undefined;
+prevKeyword = undefined;
+prevPage = undefined;
 
-module.exports.listacordaos = (queryBody) => {
-  let page = queryBody.page;
-  let orderBy = queryBody.orderBy;
-  let keywords = queryBody.keywords;
-  let query;
-  if (!keywords || keywords == "") {
-    query = Acordao.find({}, { processo: 1, data_acordao: 1, url: 1 });
+function checkParamsAreTheSame(queryBody) {
+  let { page, orderBy, keywords } = queryBody;
+  console.log(page);
+  console.log(prevPage);
+  if (
+    prevKeyword === keywords &&
+    (Number(page) === Number(prevPage) + 1 ||
+      Number(page) === Number(prevPage) - 1)
+  ) {
+    prevOrderBy = orderBy;
+    prevKeyword = keywords;
+    prevPage = page;
+    console.log("verdade");
+    return true;
   } else {
-    keywords = keywords.replace(/"/g, "");
+    prevOrderBy = orderBy;
+    prevKeyword = keywords;
+    prevPage = page;
+    console.log("falso");
+    return false;
+  }
+}
+
+module.exports.listacordaos = async (queryBody) => {
+  const page = queryBody.page;
+  const orderBy = queryBody.orderBy;
+  const keywords = queryBody.keywords;
+  let query = Acordao.find({}, { processo: 1, data_acordao: 1, url: 1 });
+
+  if (keywords && keywords !== "") {
+    const keywordRegex = new RegExp(keywords, "i");
     query = Acordao.find(
       {
-        $text: { $search: keywords },
-        $or: [
-          { meio_processual: { $regex: new RegExp(keywords, "i") } },
-          { descritores: { $in: [new RegExp(keywords, "i")] } },
-          { area_tematica_1: { $in: [new RegExp(keywords, "i")] } },
-          { area_tematica_2: { $in: [new RegExp(keywords, "i")] } },
+        $and: [
+          {
+            $or: [
+              { meio_processual: keywordRegex },
+              { descritores: keywordRegex },
+              { area_tematica_1: keywordRegex },
+              { area_tematica_2: keywordRegex },
+            ],
+          },
+          { $text: { $search: keywords } },
         ],
       },
       { processo: 1, data_acordao: 1, url: 1 }
@@ -27,65 +56,38 @@ module.exports.listacordaos = (queryBody) => {
   }
 
   for (let q in queryBody) {
-    if (q != "page" && q != "orderBy" && q != "keywords") {
+    if (q !== "page" && q !== "orderBy" && q !== "keywords") {
       queryBody[q] = queryBody[q].replace(/"/g, "");
-      query.find({ [q]: queryBody[q] });
+      query = query.find({ [q]: queryBody[q] });
     }
   }
 
-
-  let count = query.clone();
-  count.countDocuments()
-  
-  
-  query.skip((page - 1) * pageSize).limit(pageSize);
-  if (orderBy != null) {
-    let sortOrder;
-    params = orderBy.split(";");
-    if (params[1] == "asc") {
-      sortOrder = 1;
-    } else {
-      sortOrder = -1;
-    }
-    query
-      .sort({ [params[0]]: sortOrder })
+  if (orderBy !== null) {
+    const [sortField, sortOrder] = orderBy.split(";");
+    const sortOptions = {};
+    sortOptions[sortField] = sortOrder === "asc" ? 1 : -1;
+    query = query.sort(sortOptions);
+  }
+  let acordaos = undefined;
+  if (checkParamsAreTheSame(queryBody)) {
+    acordaos = await query
       .skip((page - 1) * pageSize)
-      .limit(pageSize);
+      .limit(pageSize)
+      .exec();
+  } else {
+    const countQuery = query.model.countDocuments(query.getQuery());
+    totalItems = await countQuery.exec();
+    acordaos = await query
+      .skip((page - 1) * pageSize)
+      .limit(pageSize)
+      .exec();
   }
-
-
-
-
-  return count.exec()
-  .then((count) => {
-    return query
-      .exec()
-      .then((acordaos) => {
-        return {
-          acordaos: acordaos,
-          totalItem: count,
-          itemsPerPage: pageSize,
-        };
-      }
-    )
-  })
-  .catch((err) => {
-    console.log(err);
-    return err;
-  });
-  //return query
-  //  .exec()
-  //  .then((acordaos) => {
-  //    return {
-  //      acordaos: acordaos,
-  //      totalItem: totalItem,
-  //      itemsPerPage: pageSize,
-  //    };
-  //  })
-  //  .catch((err) => {
-  //    console.log(err);
-  //    return err;
-  //  });
+  prevPage = page;
+  return {
+    acordaos: acordaos,
+    totalItem: totalItems,
+    itemsPerPage: pageSize,
+  };
 };
 
 module.exports.getacordao = (id) => {
