@@ -8,15 +8,32 @@ Com acorthemis, pretende-se criar uma plataforma que permita a pesquisa, revisã
 
 ## Backend
 
-### Dataset
+### Dataset e Taxonomia de Termos
 
-Depois de analisar os vários datasets disponibilizados pelo docente, conclui-se quais eram os campos que valiam a pena estar no dataset final e quais não.
+- Foram-nos disponibilizados 14 datasets iniciais, que nós juntámos num único dataset final. Nenhuma informação de nenhum dataset inicial foi perdida, no entanto, ela ficou disposta de forma diferente no dataset final. Com isto, acabamos por ficar com os seguintes campos: 
 
-### Taxonomia de termos
+    - Retirados diretamente dos datasets iniciais:
+        - "processo", "relator", "descritores", "n_documento", "data_acordao", "especie", "requerente", "texto_integral", "url", "tribunal", "votacao", "privacidade", "n_convencional", "decisao", "sumario", "requerido", "indicacoes_eventuais", "tribunal_1_instancia", "autor", "reu", "seccao", "tribunal_nome", "recorrido_1", "meio_processual", "recorrente", "recorrido_2", "decisao_texto_integral", "tribunal_recorrido", "processo_tribunal_recorrido", "tribunal_recurso", "processo_tribunal_recurso", "magistrado", "area_tematica_1", "area_tematica_2"
 
+    - Retirados diretamente dos datasets iniciais e colocados dentro do campo do dataset final "referências":
+        - "normas_apreciadas", "constituicao", "normas_julgadas_inconst",  "normas_suscitadas", "jurisprudencia_constitucional", "normas_declaradas_inconst", "referencias_internacionais", "referencia_pareceres", "legislacao_comunitaria", "outras_publicacoes", "outra_jurisprudencia", "legislacao_estrangeira", "jurisprudencia_estrangeira", "jurisprudencia_internacional", "jurisprudencia_nacional", "objecto", "referencia_doutrina", "referencia_publicacao", "recusa_aplicacao"
+
+    - Informação de todos os campos dos datasets iniciais que não ficaram em nenhum campo específico, ficando tudo numa só string:
+        - "anotacoes_extra"
 
 ### Coleções 
 
+- "acordaos"
+    - Representa os diferentes acórdãos (informação que estava nos datasets iniciais), que são a base para quase todas as funcionalidades do site.
+    
+- "lists"
+    - O site tem a funcionalidade de um utilizador poder criar listas de acórdãos, de forma a organiza-los e junta-los como lhe convier. Esta coleção representa as listas que o utilizador cria. 
+
+- "reviews"
+    - Para adicionar/alterar um acórdão, um utilizador faz uma review. Essa review representa uma proposta dessa adição/alteração. Posteriormente, os users admin, podem aceitar essa proposta, adicionand/editando, desta forma, o acórdão a que a review se refere, e retirando a review da database.
+  
+- "users"
+    - Utilizadores do site. Estes têm a possibilidade de procurar por acórdãos, consulta-los, coloca-los em listas, sugerir adições, sugerir alterações e, se forem admin, aceitar essas adições/alterações.
 
 ### Tratamento de pedidos
 
@@ -25,56 +42,69 @@ Depois de analisar os vários datasets disponibilizados pelo docente, conclui-se
     - `/acordaos?page=${page}&orderBy=${campo};(desc|asc)&keywords=${keywords}&(filtro=${filtro})+`
 
         - Devolve a página `page` da lista dos acórdãos ordenada por `campo` (definido pelo utilizador), com `keywords`, que procura em campos específicos dos acórdãos o termo ou frase inserida. Para além disso também é possível filtrar pelos campos dos acordãos.
+          
     - `/acordaos/${id}`
 
         - Devolve o acórdão com o respetivo `id`
     - `/reviews?page=${page}`
 
-        - Devolve a página `page` da lista de reviews. 
+        - Devolve a página `page` da lista de reviews.
+          
     - `/reviews/${id}`
 
         - Devolve a review com o respetivo `id`
+          
     - `/users/${username}`
 
        - Devolve a página do utilizador com `username`
+         
     - `/lists?list=${listId}`
 
         - Devolve a lista com o id `listId`
+          
     - `/lists?user=${username}`
 
         - Devolve a lista de listas de acórdãos que o utilizador com `username`
         
 - POSTS
     - `/lists`
+        - Coloca uma lista na database.
+ 
     - `/acordaos`
+        - Coloca um acórdão na database.
+          
     - `/reviews`
+        - Coloca uma review na database.
+          
     - `/users`
+        - Coloca um user na database.
+          
     - `/auth`
+        - Faz o login.
+          
     - `/reviews/accept/${reviewId}`
-
         - Aceita uma `review`, ou seja, cria/altera o acórdão ao qual a `review` se refere.
 
 - PUT [UPDATE]
-    - `/lists?user=${username}&list=${listName}`
 
-        - 
     - `/acordaos/{acordaoID}`
-
-        - Edita o acórdão
+        - Edita o acórdão.
+        
     - `/users/${username}`
-
-
-        - Edita o utilizador
+        - Edita o utilizador.
 
 - DELETE
     - `/lists?list=${listId}&acordao=${acordaoId}`;
-
         - Elimina um acórdão da lista selecionada
+          
     - `/lists?list=${listId}`;
-
-        - Elimina a lista selecionada
+        - Elimina a lista selecionada.
+          
     - `/reviews/${id}`;
+        - Elimina a review com o id selecionado.
+          
     - `/users/${username}`.
+        - Elimina o user com o uesrname selecionado.
 
 
 ## Frontend
@@ -106,5 +136,9 @@ Foram criados vários módulos onde cada possui um ficheiro denominado por "+pag
         - add: página que permite criar uma lista de acordãos. 
     - search: página que permite pesquisar utilizadores na base de dados pelo seu nome.
 - "error": página geral de erro.
+
+## Trabalho futuro
+- 
+- A database ficou organizada de forma a ter acesso às diferentes referências. Isso torna possível que, tendo acesso a outra batabase com os documentos presentes nas referências, se faça essa ligação de forma quase automática, integrando os acórdãos de um forma muito mais completa. Algo semelhante poderia também ser feito com as entidades/instituições/pessoas referidas em campos como "relator", "tribunal_1_instancia" ou "requerido".
 
 ## Conclusão
