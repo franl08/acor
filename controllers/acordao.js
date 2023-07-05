@@ -1,30 +1,19 @@
 const mongoose = require("mongoose");
 const Acordao = require("../models/acordao");
+const _ = require("lodash");
 
 pageSize = 5;
 totalItems = undefined;
-prevKeyword = undefined;
-prevPage = undefined;
+prevQuery = undefined;
 
-function checkParamsAreTheSame(queryBody) {
-  let { page, orderBy, keywords } = queryBody;
-  console.log(page);
-  console.log(prevPage);
-  if (
-    prevKeyword === keywords &&
-    (Number(page) === Number(prevPage) + 1 ||
-      Number(page) === Number(prevPage) - 1)
-  ) {
-    prevOrderBy = orderBy;
-    prevKeyword = keywords;
-    prevPage = page;
-    console.log("verdade");
+function checkSendCache(queryBody) {
+  let { page, orderBy, ...curQuery } = queryBody;
+  console.log(curQuery);
+  console.log(prevQuery);
+  if (_.isEqual(curQuery, prevQuery)) {
     return true;
   } else {
-    prevOrderBy = orderBy;
-    prevKeyword = keywords;
-    prevPage = page;
-    console.log("falso");
+    prevQuery = curQuery;
     return false;
   }
 }
@@ -61,7 +50,7 @@ module.exports.listacordaos = async (queryBody) => {
       query = query.find({ [q]: queryBody[q] });
     }
   }
-
+  console.log(query);
   if (orderBy !== null) {
     const [sortField, sortOrder] = orderBy.split(";");
     const sortOptions = {};
@@ -69,7 +58,7 @@ module.exports.listacordaos = async (queryBody) => {
     query = query.sort(sortOptions);
   }
   let acordaos = undefined;
-  if (checkParamsAreTheSame(queryBody)) {
+  if (totalItems && checkSendCache(queryBody)) {
     acordaos = await query
       .skip((page - 1) * pageSize)
       .limit(pageSize)
@@ -77,12 +66,12 @@ module.exports.listacordaos = async (queryBody) => {
   } else {
     const countQuery = query.model.countDocuments(query.getQuery());
     totalItems = await countQuery.exec();
+    console.log(totalItems);
     acordaos = await query
       .skip((page - 1) * pageSize)
       .limit(pageSize)
       .exec();
   }
-  prevPage = page;
   return {
     acordaos: acordaos,
     totalItem: totalItems,
