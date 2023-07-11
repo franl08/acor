@@ -4,7 +4,6 @@ const auth = require("../utils/auth");
 const User = require("../controllers/user");
 
 router.post("/", function (req, res, next) {
-  console.log(req.body);
   User.getByUsername(req.body.username)
     .then(async ({ password, ...user }) => {
       if (password !== undefined) {

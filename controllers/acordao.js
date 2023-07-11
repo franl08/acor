@@ -8,8 +8,6 @@ prevQuery = undefined;
 
 function checkSendCache(queryBody) {
   let { page, orderBy, ...curQuery } = queryBody;
-  console.log(curQuery);
-  console.log(prevQuery);
   if (_.isEqual(curQuery, prevQuery)) {
     return true;
   } else {
@@ -50,7 +48,6 @@ module.exports.listacordaos = async (queryBody) => {
       query = query.find({ [q]: queryBody[q] });
     }
   }
-  console.log(query);
   if (orderBy !== null) {
     const [sortField, sortOrder] = orderBy.split(";");
     const sortOptions = {};
@@ -66,7 +63,6 @@ module.exports.listacordaos = async (queryBody) => {
   } else {
     const countQuery = query.model.countDocuments(query.getQuery());
     totalItems = await countQuery.exec();
-    console.log(totalItems);
     acordaos = await query
       .skip((page - 1) * pageSize)
       .limit(pageSize)
@@ -80,7 +76,6 @@ module.exports.listacordaos = async (queryBody) => {
 };
 
 module.exports.getacordao = (id) => {
-  console.log(id);
   return Acordao.findOne({ _id: id })
     .then((res) => {
       return res;

@@ -3,7 +3,6 @@ const router = express.Router();
 var Acordaos = require("../controllers/acordao");
 
 router.get("/", function (req, res, next) {
-  console.dir(req.query);
   Acordaos.listacordaos(req.query)
     .then((data) => {
       console.log(data);
